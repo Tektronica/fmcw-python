@@ -9,8 +9,8 @@ RANGE + VELOCITY DETERMINATION OVER ONE CHIRP
 c = 3e8  # Speed of light in meters per second
 
 # TARGET PARAMETERS
-r = 75  # (m) target range
-v = 20  # (m/s) target velocity
+r = 300  # (m) target range
+v = 36  # (m/s) target velocity
 rad = 0 * np.pi / 180  # (radians) angle of arrival
 
 # RANGE PARAMETERS
@@ -51,14 +51,20 @@ f_rx = fc + f_slope * ((t - time_delay) % Tchirp) + doppler_shift
 
 # Capture the beat frequency for each successive chirp in measurement window
 IF_2DMatrix = np.zeros((chirpPeriods, Nchirp))
+t = np.arange(Nchirp) / fs
 
 for chirp_index in range(chirpPeriods):
-    left = chirp_index * Nchirp
-    right = left + Nchirp
+    # left = chirp_index * Nchirp
+    # right = left + Nchirp
 
-    # Perform the subtraction for the current interval
-    f_beat = f_tx[left:right] - f_rx[left:right]
-    signal_beat = np.cos(2 * np.pi * f_beat * t[left:right])
+    # # Perform the subtraction for the current interval
+    # f_beat = f_tx[left:right] - f_rx[left:right]
+    # signal_beat = np.cos(2 * np.pi * f_beat * t[left:right])
+
+    td = 2 * r / c
+    phase_shift = fc * 2 * v * chirp_index * Tchirp / c
+    frequency_shift = f_slope * td + 2 * v * (fc + chirp_index * BW) / c
+    signal_beat = 0.5 * np.cos(-2*np.pi*(frequency_shift * t + phase_shift))
 
     IF_2DMatrix[chirp_index, :] = signal_beat
 
@@ -73,8 +79,8 @@ plt.figure(figsize=(10, 8))
 
 # FREQUENCY SWEEP AS A FUNCTION OF TIME
 plt.subplot(2, 1, 1)
-plt.plot(t[0: 2 * Nchirp] * 1e6, f_tx[0: 2 * Nchirp] * 1e-9, label="TX Signal")
-plt.plot(t[0: 2 * Nchirp] * 1e6, f_rx[0: 2 * Nchirp] * 1e-9, label="RX Signal")
+plt.plot(t[0:  Nchirp] * 1e6, f_tx[0:  Nchirp] * 1e-9, label="TX Signal")
+plt.plot(t[0:  Nchirp] * 1e6, f_rx[0:  Nchirp] * 1e-9, label="RX Signal")
 plt.title("FMCW Chirp Frequency")
 plt.xlabel("Time (us)")
 plt.ylabel("Frequency (GHz)")
