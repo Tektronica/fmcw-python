@@ -10,7 +10,7 @@ c = 3e8  # Speed of light in meters per second
 
 # TARGET PARAMETERS
 r = 300  # (m) target range
-v = 36  # (m/s) target velocity
+v = 35  # (m/s) target velocity
 rad = 0 * np.pi / 180  # (radians) angle of arrival
 
 # RANGE PARAMETERS
@@ -61,9 +61,12 @@ for chirp_index in range(chirpPeriods):
     # f_beat = f_tx[left:right] - f_rx[left:right]
     # signal_beat = np.cos(2 * np.pi * f_beat * t[left:right])
 
-    td = 2 * r / c
-    phase_shift = fc * 2 * v * chirp_index * Tchirp / c
-    frequency_shift = f_slope * td + 2 * v * (fc + chirp_index * BW) / c
+    #    a = (-2*pi*fc*2*V*i*tm/c ...    %phase shift
+    #          -2*pi*(2*V*(fc+i*bw)/c + sweep_slope*td)*t);   %frequency
+    step = chirp_index * Tchirp
+    phase_shift = step * doppler_shift
+    frequency_shift = (f_slope * time_delay) + (step + phase_shift)
+
     signal_beat = 0.5 * np.cos(-2*np.pi*(frequency_shift * t + phase_shift))
 
     IF_2DMatrix[chirp_index, :] = signal_beat
