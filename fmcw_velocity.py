@@ -9,7 +9,7 @@ RANGE + VELOCITY DETERMINATION OVER ONE CHIRP
 c = 3e8  # Speed of light in meters per second
 
 # TARGET PARAMETERS
-r = 300  # (m) target range
+r = 250  # (m) target range
 v = 35  # (m/s) target velocity
 rad = 0 * np.pi / 180  # (radians) angle of arrival
 
@@ -46,12 +46,12 @@ f_tx = fc + f_slope * (t % Tchirp)
 
 # Reflected Signal
 time_delay = (2 * r) / c
-doppler_shift = (2 * v * fc * np.cos(rad)) / c
+doppler_shift = (2 * v * fc) / c
 f_rx = fc + f_slope * ((t - time_delay) % Tchirp) + doppler_shift
 
 # Capture the beat frequency for each successive chirp in measurement window
 IF_2DMatrix = np.zeros((chirpPeriods, Nchirp))
-t = np.arange(Nchirp) / fs
+td = np.arange(Nchirp) / fs
 
 for chirp_index in range(chirpPeriods):
     # left = chirp_index * Nchirp
@@ -65,9 +65,9 @@ for chirp_index in range(chirpPeriods):
     #          -2*pi*(2*V*(fc+i*bw)/c + sweep_slope*td)*t);   %frequency
     step = chirp_index * Tchirp
     phase_shift = step * doppler_shift
-    frequency_shift = (f_slope * time_delay) + (step + phase_shift)
+    frequency_shift = step + (f_slope * time_delay) + phase_shift
 
-    signal_beat = 0.5 * np.cos(-2*np.pi*(frequency_shift * t + phase_shift))
+    signal_beat = 0.5 * np.cos(-2*np.pi*(frequency_shift * td + phase_shift))
 
     IF_2DMatrix[chirp_index, :] = signal_beat
 
@@ -82,8 +82,8 @@ plt.figure(figsize=(10, 8))
 
 # FREQUENCY SWEEP AS A FUNCTION OF TIME
 plt.subplot(2, 1, 1)
-plt.plot(t[0:  Nchirp] * 1e6, f_tx[0:  Nchirp] * 1e-9, label="TX Signal")
-plt.plot(t[0:  Nchirp] * 1e6, f_rx[0:  Nchirp] * 1e-9, label="RX Signal")
+plt.plot(t[0:  2*Nchirp] * 1e6, f_tx[0:  2*Nchirp] * 1e-9, label="TX Signal")
+plt.plot(t[0:  2*Nchirp] * 1e6, f_rx[0:  2*Nchirp] * 1e-9, label="RX Signal")
 plt.title("FMCW Chirp Frequency")
 plt.xlabel("Time (us)")
 plt.ylabel("Frequency (GHz)")
@@ -91,7 +91,7 @@ plt.legend()
 
 # RANGE FFT OF  RAMP AS A FUNCTION OF TIME
 chirp0 = rdm[0]
-range_normalized = np.abs(chirp0) / len(chirp0)
+range_normalized = 2 * np.abs(chirp0) / len(chirp0)
 
 plt.subplot(2, 2, 3)
 plt.plot(rangeBin[0: Nchirp // 2], range_normalized[0: Nchirp // 2])
