@@ -51,7 +51,7 @@ f_rx = fc + f_slope * ((t - time_delay) % Tchirp) + doppler_shift
 
 # Capture the beat frequency for each successive chirp in measurement window
 IF_2DMatrix = np.zeros((chirpPeriods, Nchirp))
-td = np.arange(Nchirp) / fs
+td = np.arange(Nchirp) * dt
 
 for chirp_index in range(chirpPeriods):
     # left = chirp_index * Nchirp
