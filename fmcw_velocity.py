@@ -54,15 +54,6 @@ IF_2DMatrix = np.zeros((chirpPeriods, Nchirp))
 td = np.arange(Nchirp) * dt
 
 for chirp_index in range(chirpPeriods):
-    # left = chirp_index * Nchirp
-    # right = left + Nchirp
-
-    # # Perform the subtraction for the current interval
-    # f_beat = f_tx[left:right] - f_rx[left:right]
-    # signal_beat = np.cos(2 * np.pi * f_beat * t[left:right])
-
-    #    a = (-2*pi*fc*2*V*i*tm/c ...    %phase shift
-    #          -2*pi*(2*V*(fc+i*bw)/c + sweep_slope*td)*t);   %frequency
     step = chirp_index * Tchirp
     phase_shift = step * doppler_shift
     frequency_shift = step + (f_slope * time_delay) + phase_shift
