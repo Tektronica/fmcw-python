@@ -13,6 +13,8 @@ This repository contains Python examples for exploring the concepts of Frequency
 
 Frequency-Modulated Continuous-Wave (FMCW) radar is a radar technology that utilizes frequency modulation to measure distances and velocities of targets. This repository aims to provide Python code examples for understanding and visualizing the principles behind FMCW radar.
 
+![Equations](FMCW.png)
+
 ![Range Plot](range.png)
 
 ![Range Doppler Map](range_doppler_map.png)
