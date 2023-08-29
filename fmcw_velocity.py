@@ -9,7 +9,7 @@ RANGE + VELOCITY DETERMINATION OVER ONE CHIRP
 c = 3e8  # Speed of light in meters per second
 
 # TARGET PARAMETERS
-r = 150  # (m) target range
+r = 250  # (m) target range
 v = 15  # (m/s) target velocity
 rad = 0 * np.pi / 180  # (radians) angle of arrival
 
@@ -26,7 +26,7 @@ BW = Nchirp * (c / (4 * Rmax))  # (Hz) Bandwidth (sets range resolution)
 fc = 77e9  # (Hz) carrier frequency
 lambda_val = c / fc  # Radar wavelength
 Tchirp = 6 * (2 * Rmax / c)  # (s) chirp period (sweep time)
-f_slope = BW / Tchirp  # chirp slope (rise/run)
+m_slope = BW / Tchirp  # chirp slope (rise/run)
 
 # DETECTOR CHARACTERISTICS
 Rres = c / (2 * BW)  # (m) range resolution
@@ -42,12 +42,12 @@ dt = 1 / fs  # time step
 t = np.arange(0, chirpPeriods * Tchirp, dt)  # Time of Tx and Rx
 
 # Local Oscillator of the detector
-f_tx = fc + f_slope * (t % Tchirp)
+f_tx = fc + m_slope * (t % Tchirp)
 
 # Reflected Signal
 time_delay = (2 * r) / c
 doppler_shift = (2 * v * fc) / c
-f_rx = fc + f_slope * ((t - time_delay) % Tchirp) + doppler_shift
+f_rx = fc + m_slope * ((t - time_delay) % Tchirp) + doppler_shift
 
 # Capture the beat frequency for each successive chirp in measurement window
 IF_2DMatrix = np.zeros((chirpPeriods, Nchirp))
@@ -55,10 +55,17 @@ td = np.arange(Nchirp) * dt
 
 for chirp_index in range(chirpPeriods):
     step = chirp_index * Tchirp
-    phase_shift = step * doppler_shift
-    frequency_shift = step + (f_slope * time_delay) + phase_shift
 
-    signal_beat = 0.5*np.cos(-2 * np.pi * (frequency_shift * td + phase_shift))
+    phi0 = 2 * np.pi * fc * time_delay  # inital phase
+    p_shift = step * doppler_shift
+    f_shift = (m_slope * time_delay) + (doppler_shift + (step * m_slope / fc))
+    phi = phi0 + 2 * np.pi * (f_shift * td - p_shift)
+
+    # a = -2*np.pi*(p_shift +
+    #               ((2*v/c) * (fc+m_slope*step) + (m_slope*time_delay))*td)
+    # signal_beat = 0.5 * np.cos(a)
+
+    signal_beat = 0.5 * np.cos(phi)
 
     IF_2DMatrix[chirp_index, :] = signal_beat
 
@@ -83,7 +90,7 @@ plt.legend()
 chirp0 = rdm[0]
 
 # additional factor of 2 to compensate for half the energy of the original signal
-range_normalized = np.abs(chirp0) / np.max(chirp0)
+range_normalized = np.abs(chirp0) / np.max(np.abs(chirp0))
 
 plt.subplot(2, 2, 3)
 plt.plot(rangeBin[0: Nchirp // 2], range_normalized[0: Nchirp // 2])
