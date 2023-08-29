@@ -9,8 +9,8 @@ RANGE + VELOCITY DETERMINATION OVER ONE CHIRP
 c = 3e8  # Speed of light in meters per second
 
 # TARGET PARAMETERS
-r = 250  # (m) target range
-v = 35  # (m/s) target velocity
+r = 150  # (m) target range
+v = 15  # (m/s) target velocity
 rad = 0 * np.pi / 180  # (radians) angle of arrival
 
 # RANGE PARAMETERS
@@ -83,7 +83,7 @@ plt.legend()
 chirp0 = rdm[0]
 
 # additional factor of 2 to compensate for half the energy of the original signal
-range_normalized = chirp0 / np.max(chirp0)
+range_normalized = np.abs(chirp0) / np.max(chirp0)
 
 plt.subplot(2, 2, 3)
 plt.plot(rangeBin[0: Nchirp // 2], range_normalized[0: Nchirp // 2])
