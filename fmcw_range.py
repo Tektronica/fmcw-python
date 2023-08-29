@@ -81,4 +81,5 @@ plt.ylabel("Amplitude")
 plt.title("FFT of Beat Frequency")
 
 plt.tight_layout()
+plt.savefig('range.png')
 plt.show()

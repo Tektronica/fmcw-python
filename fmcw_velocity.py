@@ -117,6 +117,7 @@ plt.grid(True)
 
 # PLOT
 plt.tight_layout()
+plt.savefig('range_doppler_map.png')
 plt.show()
 
 # data
