@@ -38,9 +38,6 @@ f_beat_max = (2 * BW * Rmax) / (c * Tchirp)  # (Hz) sampler rate
 fs = 2 * f_beat_max  # (Hz) sampler rate
 dt = 1 / fs  # time step
 
-print(">>> samples in measurement", N)
-print(">>> samples in chirp", Nchirp)
-
 # Generate time vector
 t = np.arange(0, chirpPeriods * Tchirp, dt)  # Time of Tx and Rx
 
@@ -59,8 +56,7 @@ signal_beat = np.cos(2 * np.pi * f_beat * t)
 
 # Perform FFT on the beat signal
 fft_result = np.fft.fft(signal_beat)
-print('length', len(fft_result))
-fft_normalize = 2 * np.abs(fft_result / len(fft_result))
+fft_normalize = 2 * np.abs(fft_result) / len(fft_result)
 frequency_bins = np.fft.fftfreq(len(fft_normalize), d=dt)
 
 # convert spectrum to range distance

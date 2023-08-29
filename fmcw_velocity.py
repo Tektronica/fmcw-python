@@ -58,23 +58,22 @@ for chirp_index in range(chirpPeriods):
     phase_shift = step * doppler_shift
     frequency_shift = step + (f_slope * time_delay) + phase_shift
 
-    signal_beat = 0.5 * np.cos(-2*np.pi*(frequency_shift * td + phase_shift))
+    signal_beat = 0.5*np.cos(-2 * np.pi * (frequency_shift * td + phase_shift))
 
     IF_2DMatrix[chirp_index, :] = signal_beat
 
 # construct Range-Doppler Image from dimmensional FFT
-rdm = np.fft.fftshift(np.fft.fft2(IF_2DMatrix), axes=0)
-
+rdm = np.fft.fftshift(np.fft.fft2(IF_2DMatrix, norm="backward"), axes=0)
 rangeBin = np.arange(0, Rmax, Rres)
-velocityBin = np.arange(-Vmax, Vmax, Vres/2)
+velocityBin = np.arange(-Vmax, Vmax, Vres / 2)
 
 # Plot the results
 plt.figure(figsize=(10, 8))
 
 # FREQUENCY SWEEP AS A FUNCTION OF TIME
 plt.subplot(2, 1, 1)
-plt.plot(t[0:  2*Nchirp] * 1e6, f_tx[0:  2*Nchirp] * 1e-9, label="TX Signal")
-plt.plot(t[0:  2*Nchirp] * 1e6, f_rx[0:  2*Nchirp] * 1e-9, label="RX Signal")
+plt.plot(t[0: 2 * Nchirp] * 1e6, f_tx[0: 2 * Nchirp] * 1e-9, label="TX Signal")
+plt.plot(t[0: 2 * Nchirp] * 1e6, f_rx[0: 2 * Nchirp] * 1e-9, label="RX Signal")
 plt.title("FMCW Chirp Frequency")
 plt.xlabel("Time (us)")
 plt.ylabel("Frequency (GHz)")
@@ -82,7 +81,9 @@ plt.legend()
 
 # RANGE FFT OF  RAMP AS A FUNCTION OF TIME
 chirp0 = rdm[0]
-range_normalized = 2 * np.abs(chirp0) / len(chirp0)
+
+# additional factor of 2 to compensate for half the energy of the original signal
+range_normalized = chirp0 / np.max(chirp0)
 
 plt.subplot(2, 2, 3)
 plt.plot(rangeBin[0: Nchirp // 2], range_normalized[0: Nchirp // 2])
