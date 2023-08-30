@@ -48,22 +48,17 @@ doppler_shift = (2 * v * fc) / c
 f_rx = fc + m_slope * ((t - time_delay) % Tchirp) + doppler_shift
 
 # Capture the beat frequency for each successive chirp in measurement window
-IF_2DMatrix = np.zeros((chirpPeriods, Nchirp))
-td = np.arange(Nchirp) * dt
+IF_2DMatrix = np.zeros((chirpPeriods, Nchirp))  # 2D matrix of zeros
+tr = np.arange(Nchirp) * dt  # time base
 
 for chirp_index in range(chirpPeriods):
-    step = chirp_index * Tchirp
+    phi0 = 2 * np.pi * fc * time_delay  # inital
+    fbeat = m_slope * time_delay * tr  # beat frequency
 
-    phi0 = 2 * np.pi * fc * time_delay  # inital phase
-    p_shift = step * doppler_shift
-    f_shift = (m_slope * time_delay) + (doppler_shift + (step * m_slope / fc))
-    phi = phi0 + 2 * np.pi * (f_shift * td - p_shift)
+    offset = chirp_index * Tchirp  # time offset within the chirp sequence
+    doppler_shift = (2 * v / c) * (fc * tr + offset * (fc + m_slope * tr))
 
-    # a = -2*np.pi*(p_shift +
-    #               ((2*v/c) * (fc+m_slope*step) + (m_slope*time_delay))*td)
-    # signal_beat = 0.5 * np.cos(a)
-
-    signal_beat = 0.5 * np.cos(phi)
+    signal_beat = 0.5 * np.cos(phi0 - 2 * np.pi * (fbeat - doppler_shift))
 
     IF_2DMatrix[chirp_index, :] = signal_beat
 
