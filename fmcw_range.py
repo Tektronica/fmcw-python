@@ -7,30 +7,28 @@ RANGE DETERMINATION OVER ONE CHIRP
 
 # CONSTANTS
 c = 3e8  # Speed of light in meters per second
+fc = 48e6  # (Hz) carrier frequency
 
 # TARGET PARAMETERS
-r = 75  # (m) target range
-v = 20  # (m/s) target velocity
+r = 250  # (m) target range
+v = 15  # (m/s) target velocity
 rad = 0 * np.pi / 180  # (radians) angle of arrival
+
+# DETECTOR (ADC + Signal Generator)
+Nchirp = 512  # sample period of chirp
+chirpPeriods = 2  # number of chirp periods in measurement
+N = Nchirp * chirpPeriods  # sample period of measurement
 
 # RANGE PARAMETERS
 Rmax = 500  # (m) max range
-Rres = 0.5  # (m) range resolution
+Rres = 2 * Rmax / Nchirp  # (m) range resolution
 
-# DETECTOR (ADC + Signal Generator)
-chirpPeriods = 2
-Nchirp = 512
-N = chirpPeriods * Nchirp  # sample period of measurement
-BW = (c / (2 * Rres))  # (Hz) Bandwidth (sets range resolution)
-
-# SIGNAL PARAMETERS
-fc = 48e6  # (Hz) carrier frequency
-lambda_val = c / fc  # Radar wavelength
+BW = c / (2 * Rres)  # (Hz) Bandwidth (sets range resolution)
 Tchirp = 6 * (2 * Rmax / c)  # (s) chirp period (sweep time)
-f_slope = BW / Tchirp  # chirp slope (rise/run)
+m_slope = BW / Tchirp  # chirp slope (rise/run)
 
-# DETECTOR CHARACTERISTICS
-Vmax = lambda_val / (4 * Tchirp)  # (m/s) max detectable velocity
+# VELOCITY CHARACTERISTICS
+Vmax = c / (4 * fc * Tchirp)  # (m/s) max detectable velocity
 Vres = 2 * Vmax / Nchirp  # (m/s) velocity resolution
 
 # SAMPLING PARAMETERS
@@ -42,12 +40,12 @@ dt = 1 / fs  # time step
 t = np.arange(0, chirpPeriods * Tchirp, dt)  # Time of Tx and Rx
 
 # Local Oscillator of the detector
-f_tx = fc + f_slope * (t % Tchirp)
+f_tx = fc + m_slope * (t % Tchirp)
 
 # Reflected Signal
 time_delay = 2 * r / c
 doppler_shift = 2 * v * fc / c
-f_rx = fc + f_slope * ((t - time_delay) % Tchirp) - doppler_shift
+f_rx = fc + m_slope * ((t - time_delay) % Tchirp) - doppler_shift
 
 # Calculate the beat signal (difference between RX and TX frequencies)
 f_beat = f_rx - f_tx  # f2(t) - f1(t)
@@ -60,7 +58,7 @@ fft_normalize = 2 * np.abs(fft_result) / len(fft_result)
 frequency_bins = np.fft.fftfreq(len(fft_normalize), d=dt)
 
 # convert spectrum to range distance
-range_target = np.abs(((c / 2) * (frequency_bins / f_slope)))
+range_target = np.abs(((c / 2) * (frequency_bins / m_slope)))
 
 # Plot the results
 plt.figure(figsize=(10, 8))
@@ -79,7 +77,21 @@ plt.plot(range_target, fft_normalize)
 plt.xlabel("Range to Target (m)")
 plt.ylabel("Amplitude")
 plt.title("FFT of Beat Frequency")
+text_str = (
+    f"{'{:<22}'.format('Max Range:')}{Rmax:.1f} m\n"
+    f"{'{:<22}'.format('Range Resolution:')}{Rres:.2f} m\n"
+    f"{'{:<22}'.format('Max Velocity:')}{Vmax:.1f} m/s\n"
+    f"{'{:<22}'.format('Velocity Resolution:')}{Vres:.1f} m/s"
+)
+plt.annotate(
+    text_str,
+    xy=(0.05, 0.95),
+    xycoords="axes fraction",
+    fontsize=10,
+    fontfamily="monospace",
+    verticalalignment="top",
+)
 
 plt.tight_layout()
-plt.savefig('range.png')
+plt.savefig("range.png")
 plt.show()

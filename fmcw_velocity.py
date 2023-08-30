@@ -7,30 +7,28 @@ RANGE + VELOCITY DETERMINATION OVER ONE CHIRP
 
 # CONSTANTS
 c = 3e8  # Speed of light in meters per second
+fc = 77e9  # (Hz) carrier frequency
 
 # TARGET PARAMETERS
 r = 250  # (m) target range
 v = 15  # (m/s) target velocity
 rad = 0 * np.pi / 180  # (radians) angle of arrival
 
+# DETECTOR (ADC + Signal Generator)
+Nchirp = 512  # sample period of chirp
+chirpPeriods = 64  # number of chirp periods in measurement
+N = Nchirp * chirpPeriods  # sample period of measurement
+
 # RANGE PARAMETERS
 Rmax = 500  # (m) max range
+Rres = 2 * Rmax / Nchirp  # (m) range resolution
 
-# DETECTOR (ADC + Signal Generator)
-chirpPeriods = 64
-Nchirp = 512
-N = chirpPeriods * Nchirp  # sample period of measurement
-BW = Nchirp * (c / (4 * Rmax))  # (Hz) Bandwidth (sets range resolution)
-
-# SIGNAL PARAMETERS
-fc = 77e9  # (Hz) carrier frequency
-lambda_val = c / fc  # Radar wavelength
+BW = c / (2 * Rres)  # (Hz) Bandwidth (sets range resolution)
 Tchirp = 6 * (2 * Rmax / c)  # (s) chirp period (sweep time)
 m_slope = BW / Tchirp  # chirp slope (rise/run)
 
-# DETECTOR CHARACTERISTICS
-Rres = c / (2 * BW)  # (m) range resolution
-Vmax = lambda_val / (4 * Tchirp)  # (m/s) max detectable velocity
+# VELOCITY CHARACTERISTICS
+Vmax = c / (4 * fc * Tchirp)  # (m/s) max detectable velocity
 Vres = 2 * Vmax / Nchirp  # (m/s) velocity resolution
 
 # SAMPLING PARAMETERS
@@ -86,17 +84,31 @@ plt.xlabel("Time (us)")
 plt.ylabel("Frequency (GHz)")
 plt.legend()
 
-# RANGE FFT OF  RAMP AS A FUNCTION OF TIME
-chirp0 = rdm[0]
+# RANGE FFT OF RAMP AS A FUNCTION OF TIME
+chirp0 = rdm[:, : Nchirp // 2][0]
 
 # additional factor of 2 to compensate for half the energy of the original signal
 range_normalized = np.abs(chirp0) / np.max(np.abs(chirp0))
 
 plt.subplot(2, 2, 3)
-plt.plot(rangeBin[0: Nchirp // 2], range_normalized[0: Nchirp // 2])
+plt.plot(rangeBin, range_normalized)
 plt.xlabel("Range to Target (m)")
 plt.ylabel("Amplitude")
 plt.title("FFT of Beat Frequency")
+text_str = (
+    f"{'{:<22}'.format('Max Range:')}{Rmax:.1f} m\n"
+    f"{'{:<22}'.format('Range Resolution:')}{Rres:.2f} m\n"
+    f"{'{:<22}'.format('Max Velocity:')}{Vmax:.1f} m/s\n"
+    f"{'{:<22}'.format('Velocity Resolution:')}{Vres:.1f} m/s"
+)
+plt.annotate(
+    text_str,
+    xy=(0.05, 0.95),
+    xycoords="axes fraction",
+    fontsize=6,
+    fontfamily="monospace",
+    verticalalignment="top",
+)
 
 # RANGE-DOPPLER DATA MAPPED TO IMAGE FRAME
 rdm_image = 20 * np.log10(np.abs(rdm[:, : Nchirp // 2]))
@@ -117,7 +129,7 @@ plt.grid(True)
 
 # PLOT
 plt.tight_layout()
-plt.savefig('range_doppler_map.png')
+plt.savefig("range_doppler_map.png")
 plt.show()
 
 # data
@@ -126,6 +138,7 @@ print("Chirp sample length (Nchirp):", Nchirp)
 print("meausrement capture window (N):", N)
 print("measurement sample rate (fs):", fs)
 print("")
+print("Bandwidth:", BW)
 print("Range Resolution (m):", Rres)
 print("max Range (m):", Rmax)
 print("Range Resolution (m):", Rres)
