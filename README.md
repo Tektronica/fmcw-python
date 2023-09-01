@@ -32,15 +32,15 @@ The modulated intermediate frequency (beat) signal is produced by mixing the tra
 
 Assuming a sequence of $N$ chirps and an object moving at a constant velocity, the round-trip time delay at the start of each chirp is incremented linearly. Over the span of a measurement, velocity introduces an accumulating range offset; compensated for by the inclusion range correction term in the radar signal. This range correction can be ignored in fast FMCW measurements where the doppler shift on a single chirp is very small and the number of chirps in a measurement is not too large.
 
-$$
+```math
 y(t) = \frac{\alpha}{2}\cos\left(\phi_0 - \underbrace{2\pi\frac{2v}{c}f_cnT_c}_{\text{doppler phase}} - 2\pi\left[\underbrace{\frac{2v}{c}(f_c + nB)}_{\text{range correction}} + \underbrace{\frac{B}{T_c}t_d}_{\text{beat}}\right]t\right)
-$$
+```
 
 Rearranging the equation reveals the constituent beat and doppler shift phase components contributing to the Beat signal. When the target velocity is zero, only the beat frequency component remains. The constant phase term $ϕ_0$ is set to zero since FMCW systems are not sensitive to initial phase and is considered an arbitrary calibration parameter. In relative measurements, setting the initial phase to zero is a reasonable assumption.
 
-$$
+```math
 y(t) = \frac{\alpha}{2}\cos\left(\phi_0 - \underbrace{2\pi\frac{B}{T_c}t_d}_{\text{beat}} - \underbrace{2\pi\frac{2v}{c}(f_cnT_c-2\pi(f_c+nB)t)}_{\text{doppler induced}}\right)
-$$
+```
 
 | Label                  | LaTeX Equation                          |
 | ---------------------- | --------------------------------------- |
@@ -50,9 +50,9 @@ $$
 
 Further rearrangement of terms reveals the specific beat and doppler-induced phase components:
 
-$$
+```math
 \fbox{$y(t) = \frac{\alpha}{2}\cos\left(2\pi\frac{2r}{c}m_st - 2\pi\frac{2v}{c}\left[f_ct+nT_c(f_c+m_st)\right]\right)$}
-$$
+```
 
 ```math
 y(t) = \frac{\alpha}{2}\cos\left(2\pi f_{\text{beat}}t - 2\pi f_{\text{doppler}}(t)\right)
