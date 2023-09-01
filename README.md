@@ -54,9 +54,9 @@ $$
 \fbox{$y(t) = \frac{\alpha}{2}\cos\left(2\pi\frac{2r}{c}m_st - 2\pi\frac{2v}{c}\left[f_ct+nT_c(f_c+m_st)\right]\right)$}
 $$
 
-$$
+```math
 y(t) = \frac{\alpha}{2}\cos\left(2\pi f_{\text{beat}}t - 2\pi f_{\text{doppler}}(t)\right)
-$$
+```
 
 ### Optimization
 
