@@ -43,9 +43,9 @@ t = np.arange(0, chirpPeriods * Tchirp, dt)  # Time of Tx and Rx
 f_tx = fc + m_slope * (t % Tchirp)
 
 # Reflected Signal
-time_delay = 2 * r / c
+t_delay = 2 * r / c
 doppler_shift = 2 * v * fc / c
-f_rx = fc + m_slope * ((t - time_delay) % Tchirp) - doppler_shift
+f_rx = fc + m_slope * ((t - t_delay) % Tchirp) - doppler_shift
 
 # Calculate the beat signal (difference between RX and TX frequencies)
 f_beat = f_rx - f_tx  # f2(t) - f1(t)
