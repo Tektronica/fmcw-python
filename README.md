@@ -42,11 +42,11 @@ Rearranging the equation reveals the constituent beat and doppler shift phase co
 y(t) = \frac{\alpha}{2}\cos\left(\phi_0 - \underbrace{2\pi\frac{B}{T_c}t_d}_{\text{beat}} - \underbrace{2\pi\frac{2v}{c}(f_cnT_c-2\pi(f_c+nB)t)}_{\text{doppler induced}}\right)
 ```
 
-| Label                  | LaTeX Equation                          |
-| ---------------------- | --------------------------------------- |
-| Time Delay (t_d)       | $$ t_d = \frac{2r}{c} $$                |
-| Bandwidth of Chirp (B) | $$ B = m_sT_c $$                        |
-| Chirp Period           | $$ T*{chirp} = 5.5\frac{2R*{max}}{c} $$ |
+| Label                  | LaTeX Equation                 |
+| ---------------------- | ------------------------------ |
+| Time Delay (t_d)       | $ t_d = \frac{2r}{c} $         |
+| Bandwidth of Chirp (B) | $ B = m_sT_C $                 |
+| Chirp Period           | $ T_C = 5.5\frac{2R{max}}{c} $ |
 
 Further rearrangement of terms reveals the specific beat and doppler-induced phase components:
 
